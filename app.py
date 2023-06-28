@@ -22,3 +22,42 @@ imap = imaplib.IMAP4_SSL(imap_server)
 
 # authenticate
 imap.login(username, password)
+
+# email fetching (if successful)
+status, messages = imap.select("INBOX")
+
+# number of top emails to fetch
+N = 3
+
+# total number of emails
+messages = int(messages[0])
+
+# email loop and extraction
+for i in range(messages, messages-n, -1):
+    # fetch the email message by ID
+    res, msg = imap.fetch(str(i), "(RFC822)")
+    for response in msg:
+        if isinstance(response, tuple):
+            # parse a bytes eail into a message object
+            msg = email.message_from_bytes(response[1])
+            # decode the email subject
+            subject, encoding = decode_header(msg["Subject"])[0]
+            if isinstance(subject, bytes):
+                # if it's a bytes, decode to str
+                subject = subject.decode(encoding)
+            # decode email sender
+            From, encoding = decode_header(msg.get("From"))[0]
+            if isinstance(From, bytes):
+                From = From.decode(encoding)
+            print("Subject:", subject)
+            print("From:", From)
+            # if the email message is multipart
+            if msg.is_multipart():
+                # iterate over email parts
+                for part in msg.walk():
+                    # extract content type of email
+                    content_type = part.get_content_type()
+                    content_disposition = str(part.get("Content-Disposition"))
+                    try:
+                        # get the email body
+                        body = part.get_payload(decode=True).decode
