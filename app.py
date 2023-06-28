@@ -17,4 +17,8 @@ def clean(text):
     # clean text for creating a folder
     return "".join(c if c.isalnum() else "_" for c in text)
 
+# create an IMAP4 class with SSL
+imap = imaplib.IMAP4_SSL(imap_server)
 
+# authenticate
+imap.login(username, password)
