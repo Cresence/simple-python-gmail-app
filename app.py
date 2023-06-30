@@ -50,6 +50,7 @@ def searchResult(msgs, limit):
     try: 
         for i in range(limit):
             msg = msgs[i]
+            print(f'\nEmail {i+1}) \n')
             try:
                 print(msg.from_)
             except UnicodeDecodeError:
@@ -67,7 +68,11 @@ def searchResult(msgs, limit):
                 print("Date: Value error")
             except any:
                 print("Unknown error occured")
-            print("-----")
+            try:
+                print(msg.text_body)
+            except any:
+                print("Body: Unknown error occured")
+            print("\n-----"*5)
     except:
         print("Line 66, searchResult() did not function properly: Something went wrong.")
 
@@ -77,22 +82,30 @@ def runProgram():
     # User Option
     options = ['Y', 'N']
     # User input
-    userInput = ''
-    msg = userPrompt('Would you like to search your email?\n')
-    for index, item in enumerate(options):
-        status += f'{index+1}) {item}\n'
-    
-    msg += "Your choice: "
+    user_input = ''
+    input_message = "Pick an option:\n"
 
-    while userInput.upper() not in options:
-        userInput = input(msg)
+    for index, item in enumerate(options):
+        input_message += f'{index+1}) {item}\n'
+
+    input_message += 'Your choice: '
+
+    while user_input.upper() not in options:
+        user_input = input(input_message)
+
+    # Case-sensitive Input
+    user_input = user_input.upper()
     # User picks N (No)
-    if userInput == options[1]:
-        print('You picked: ' + userInput)
+    if user_input == options[1]:
         print('\nGoodbye!')
     # User picks Y (Yes)
-
-
+    if user_input == options[0]:
+        serverQuery(searchTerm(), searchLimits())
+        # Check user for concurrent query requests
+        runProgram() 
+    
+        
+runProgram()
 
 # Static search test:
 # msgs = inbox.search(SUBJECT("bill"))
